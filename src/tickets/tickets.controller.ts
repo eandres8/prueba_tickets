@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Res, HttpStatus, Body, Req } from '@nestjs/common';
+import { Controller, Get, Post, Res, HttpStatus, Body, Req, Put } from '@nestjs/common';
 import { Request, Response } from 'express';
 
 import * as jwt from "jsonwebtoken";
 
 // Models
-import { CreateTicketDTO } from '../dto/tickets.dto';
+import { CreateTicketDTO, UpdateTicketDTO } from '../dto/tickets.dto';
 
 // Services
 import { TicketsService } from './tickets.service';
@@ -77,6 +77,34 @@ export class TicketsController{
                 message: error.message
             });
         }
+    }
+
+    @Put('/update/:id')
+    async updateTicket(@Req() req: Request, @Res() res: Response, @Body() updateTicketDTO: UpdateTicketDTO ) {
+        const token = req.headers.authorization;
+        const id = req.param('id');
+
+
+        if (!token) {
+            return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'No tienes acceso a este recurso' });
+        }
+
+        const payload: any | Payload = jwt.decode(token);
+        
+        try {
+            const ticket = await this.ticketService.updateTicket(id, updateTicketDTO);
+
+            return res.status(HttpStatus.OK).json({
+                data: ticket,
+                message: 'Se actualizó correctamente el ticket'
+            });
+
+        } catch (error) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: error.message
+            });
+        }
+
     }
 
 }

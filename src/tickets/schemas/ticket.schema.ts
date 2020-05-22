@@ -5,6 +5,7 @@ export const ticketSchema = new Schema({
     address: { type: String, required: true},
     type: { type: String, enum: ["instalation", "maintenance"]},
     description: String,
+    expert_comment: String,
     client: { type: Schema.Types.ObjectId, ref: "User", required: true } ,
     expert: { type: Schema.Types.ObjectId, ref: "User" } ,
     state: { type: String, enum: ["pending", "done", "canceled", "rejected"], default: 'pending' },

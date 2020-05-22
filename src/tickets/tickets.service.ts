@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Ticket } from 'src/interfaces/ticket.interface';
-import { CreateTicketDTO } from 'src/dto/tickets.dto';
+import { CreateTicketDTO, UpdateTicketDTO } from 'src/dto/tickets.dto';
 import { User } from 'src/interfaces/user.interface';
 import { Payload } from 'src/interfaces/payload.interface';
 
@@ -51,8 +51,8 @@ export class TicketsService {
         return await ticket.save();
     }
 
-    async updateTicket(ticketId: string, newTicket: Ticket): Promise<Ticket> {
-        const ticketUpdated = await this.ticketModel.findByIdAndUpdate(ticketId, newTicket, {new: true});
+    async updateTicket(ticketId: string, newTicket: UpdateTicketDTO): Promise<Ticket> {
+        const ticketUpdated = await this.ticketModel.findByIdAndUpdate(ticketId, { ...newTicket, updated_at: new Date() }, {new: true});
         return ticketUpdated;
     }
 

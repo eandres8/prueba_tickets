@@ -5,6 +5,7 @@ export interface Ticket extends Document {
     address: string;
     type: 'instalation' | 'maintenance';
     description?: string,
+    expert_comment?: string;
     client?: string;
     expert?: string;
     state: "pending" | "done" | "canceled" | "rejected";

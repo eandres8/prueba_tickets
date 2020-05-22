@@ -6,3 +6,8 @@ export class CreateTicketDTO {
     description: string;
     client: string;
 }
+
+export class UpdateTicketDTO {
+    state: "pending" | "done" | "canceled" | "rejected";
+    expert_comment: string;
+}
