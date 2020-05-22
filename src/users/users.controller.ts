@@ -28,6 +28,15 @@ export class UsersController {
         });
     }
 
+    @Get('/detail')
+    async detailUser(@Res() res) {
+        const users = await this.userService.getUser('1');
+
+        return res.status(HttpStatus.OK).json({
+            data: users,
+        });
+    }
+
 
     @Post('/create')
     async createUser(@Res() res, @Body() createUserDTO: CreateUserDTO) {
@@ -55,8 +64,6 @@ export class UsersController {
     @Post('/login')
     async loginUser(@Res() res, @Body() loginUserDTO: LoginUserDTO) {
         const user = await this.userService.loginUser(loginUserDTO);
-
-        console.log("user", user);
 
         if( !user ) {
             return res.status(HttpStatus.BAD_REQUEST).json({

@@ -28,6 +28,8 @@ export class UsersService {
 
         const user = await this.userModel.findOne({ email: userDTO.email });
 
+        if (!user) return null;
+
         if (!bcrypt.compareSync(userDTO.password, user.password) ) {
 
             return null;

@@ -1,10 +1,16 @@
-import { Controller, Get, Post, Res, HttpStatus, Body } from '@nestjs/common';
+import { Controller, Get, Post, Res, HttpStatus, Body, Req } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+import * as jwt from "jsonwebtoken";
 
 // Models
 import { CreateTicketDTO } from '../dto/tickets.dto';
 
 // Services
 import { TicketsService } from './tickets.service';
+
+// Interface
+import { Payload } from 'src/interfaces/payload.interface';
 
 @Controller('tickets')
 export class TicketsController{
@@ -14,8 +20,33 @@ export class TicketsController{
     ){}
 
     @Get('/list')
-    async listTickets(@Res() res) {
+    async listTickets(@Req() req: Request, @Res() res: Response) {
+
+        const token = req.headers.authorization;
+
+        if (!token) {
+            return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'No tienes acceso a este recurso' });
+        }
+
         const tickets = await this.ticketService.getTickets();
+
+        return res.status(HttpStatus.OK).json({
+            data: tickets,
+        });
+    }
+    
+    @Get('/filter')
+    async filterTickets(@Req() req: Request, @Res() res: Response) {
+
+        const token = req.headers.authorization;
+
+        if (!token) {
+            return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'No tienes acceso a este recurso' });
+        }
+
+        const payload: any = jwt.decode(token);
+
+        const tickets = await this.ticketService.getTicketsByUser(payload);
 
         return res.status(HttpStatus.OK).json({
             data: tickets,
@@ -23,13 +54,29 @@ export class TicketsController{
     }
 
     @Post('/create')
-    async createTicket(@Res() res, @Body() createTicketDTO: CreateTicketDTO ) {
-        const ticket = await this.ticketService.createTicket(createTicketDTO);
+    async createTicket(@Req() req: Request, @Res() res: Response, @Body() createTicketDTO: CreateTicketDTO ) {
+        
+        const token = req.headers.authorization;
 
-        return res.status(HttpStatus.CREATED).json({
-            data: ticket,
-            message: 'Se creó el ticket de servicio correctamente' 
-        });
+        if ( !token ) {
+            return res.status(HttpStatus.UNAUTHORIZED).json({message: 'No tienes acceso a este recurso'});
+        }
+
+        const payload: any | Payload = jwt.decode(token);
+        createTicketDTO.client = payload.user_id;
+
+        try {
+            const ticket = await this.ticketService.createTicket(createTicketDTO);
+
+            return res.status(HttpStatus.CREATED).json({
+                data: ticket,
+                message: 'Se creó el ticket de servicio correctamente'
+            });
+        } catch (error) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message: error.message
+            });
+        }
     }
 
 }

@@ -4,4 +4,5 @@ export class CreateTicketDTO {
     date_programing: Date;
     type: 'instalation' | 'maintenance';
     description: string;
+    client: string;
 }
