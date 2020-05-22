@@ -1,7 +1,7 @@
 
-
 export class CreateTicketDTO {
     address: string;
-    type: 'Instalation' | 'Maintenance';
+    date_programing: Date;
+    type: 'instalation' | 'maintenance';
     description: string;
 }
